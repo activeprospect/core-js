@@ -20,6 +20,10 @@ var wrapConstructor = function (NativeConstructor) {
   Wrapper.prototype = NativeConstructor.prototype;
   return Wrapper;
 };
+  
+var createEmptyObject = function() { 
+  return Object.create ? Object.create(null) : {};
+};
 
 /*
   options.target      - name of the target object
@@ -43,7 +47,7 @@ module.exports = function (options, source) {
 
   var nativeSource = GLOBAL ? global : STATIC ? global[TARGET] : (global[TARGET] || {}).prototype;
 
-  var target = GLOBAL ? path : path[TARGET] || (path[TARGET] = {});
+  var target = GLOBAL ? path : path[TARGET] || (path[TARGET] = createEmptyObject());
   var targetPrototype = target.prototype;
 
   var FORCED, USE_NATIVE, VIRTUAL_PROTOTYPE;
@@ -85,7 +89,7 @@ module.exports = function (options, source) {
     if (PROTO) {
       VIRTUAL_PROTOTYPE = TARGET + 'Prototype';
       if (!has(path, VIRTUAL_PROTOTYPE)) {
-        createNonEnumerableProperty(path, VIRTUAL_PROTOTYPE, {});
+        createNonEnumerableProperty(path, VIRTUAL_PROTOTYPE, createEmptyObject());
       }
       // export virtual prototype methods
       path[VIRTUAL_PROTOTYPE][key] = sourceProperty;
